@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDoList</title>
+    <script src="js/jquery.js"></script>
+    <style>
+        body{
+            background-color: whitesmoke;
+        }
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+        .head {
+            width: 100%;
+            height: 35px;
+            background-color: black;
+        }
+        .logo {
+            float: left;
+            color: white;
+            height: 35px;
+            line-height: 35px;
+
+        }
+        .head input {
+            float: right;
+            outline: none;
+            padding: 0px 5px 0px 0px;
+            width: 280px;
+            height: 18px;
+            line-height: 15px;
+            border-radius: 5px;
+            margin: 6px 0;
+        }
+        .content {
+            width: 550px;
+            margin: 0 auto;
+
+        }
+        .title {
+            position: relative;
+            padding: 15px 0;
+            font:bold 17px '黑体';
+        }
+        .cicle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background-color: thistle;
+            transform: translateY(200%);
+            font:normal 1px '黑体';
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            line-height: 10px;
+            text-align: center;
+        }
+        .item {
+            background-color: white;
+            border-left: 5px green solid;
+            margin-bottom: 5px;
+            height: 25px;
+            padding: 2px 0px;
+        }
+
+        .item input {
+            margin-left: 10px;
+            margin-right: 5px;
+            width: 15px;
+            height: 15px;
+            vertical-align: middle;
+        }
+
+        .text {
+            display: inline-block;
+            height: 25px;
+            line-height: 25px;
+            font-size: 13px;
+        }
+        .del {
+            float: right;
+            margin-top: 7px;
+            margin-right: 9px;
+            border-radius: 9px;
+            width: 10px;
+            height: 10px;
+            background-color: #F1EDED;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="head">
+        <div class="content">
+            <div class="logo">ToDoList</div>
+            <input type="text">
+        </div>
+    </div>
+    <div class="content">
+        <div class="ing">
+            <div class="title">
+                <span>正在进行</span>
+                <div class="cicle">0</div>
+            </div>
+            <div class="tasking">
+
+            </div>
+        </div>
+        <div class="ed">
+            <div class="title">
+                <span>已经完成</span>
+                <div class="cicle">0</div>
+            </div>
+            <div class="tasked">
+
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        item1={
+            neirong:'123',
+            finish:0,
+        }
+        onload()
+/*        item2={
+            neirong:'ddddd',
+            finish:0,
+        }
+        item3={
+            neirong:'ddddd',
+            finish:1,
+        }
+        array=[item1,item2,item3]
+        localStorage.setItem('dolist',JSON.stringify(array))*/
+
+        $('.head input').keyup(function (event) {
+            if(event.keyCode==13){
+                var press=$(this).val()
+                if (press.trim()==0){
+                    alert('请输入任务')
+                }else {
+                    var dolist=localStorage.getItem('dolist')
+                    oj=JSON.parse(dolist)
+                    item={
+                        neirong:press,
+                        finish:0,
+                    }
+                    oj.push(item)
+                    localStorage.setItem('dolist',JSON.stringify(oj))
+                    $('.tasking').empty()
+                    $('.tasked').empty()
+                    onload()
+                }
+
+            }
+        })
+        $('.tasking,.tasked').on('click','.del',function (){
+            var dolist=localStorage.getItem('dolist')
+            var oj=JSON.parse(dolist)
+            var index=$(this).parent().attr('index')
+            console.log(dolist)
+            oj.splice(index,1)
+            localStorage.setItem('dolist',JSON.stringify(oj))
+            $('.tasking').empty()
+            $('.tasked').empty()
+            onload()
+            dolist=JSON.parse(localStorage.getItem('dolist'))
+            console.log(dolist)
+
+        })
+        $('.tasking,.tasked').on('change','input',function (){
+            var dolist=localStorage.getItem('dolist')
+            var oj=JSON.parse(dolist)
+            var index=$(this).parent().attr('index')
+            if(oj[index].finish==0){
+                oj[index].finish=1
+            }else {
+                oj[index].finish=0
+            }
+            localStorage.setItem('dolist',JSON.stringify(oj))
+            $('.tasking').empty()
+            $('.tasked').empty()
+            onload()
+        })
+    })
+    function onload() {
+        var dolist=localStorage.getItem('dolist')
+        if(dolist==null){
+            localStorage.setItem('dolist','[]');
+            return
+        }
+        dolist=JSON.parse(dolist)
+        ingnum=0
+        ednum=0
+        for (var i=0;i<dolist.length;i++){
+            if(dolist[i].finish==0){
+                var temp=$('                <div class="item" index= ' +
+                    i +
+                    '>\n' +
+                    '                    <input type="checkbox">\n' +
+                    '                    <div class="text">' +
+                    dolist[i].neirong +
+                    '</div>\n' +
+                    '                    <div class="del"></div>\n' +
+                    '                </div>')
+                $('.tasking').prepend(temp)
+                ingnum++
+            }else {
+                var temp=$('                <div class="item" index= ' +
+                    i +
+                    '>\n' +
+                    '                    <input type="checkbox" checked>\n' +
+                    '                    <div class="text">' +
+                    dolist[i].neirong +
+                    '</div>\n' +
+                    '                    <div class="del"></div>\n' +
+                    '                </div>')
+                $('.tasked').prepend(temp)
+                ednum++
+            }
+        }
+        $('.ing .cicle').text(ingnum)
+        $('.ed .cicle').text(ednum)
+        return dolist
+    }
+</script>
+</html>
